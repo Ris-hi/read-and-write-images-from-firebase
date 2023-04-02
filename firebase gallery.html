@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Image Gallery</title>
+</head>
+<body>
+    <div class="image-gallery">
+        {% for image_url in image_urls %}
+        <img src="{{ image_url }}">
+        {% endfor %}
+    </div>
+</body>
+</html>

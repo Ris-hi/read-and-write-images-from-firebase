@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Firebase Gallery</title>
+	<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-storage.js"></script>
+	<script>
+		// Initialize Firebase
+		var firebaseConfig = {
+			apiKey: "your-api-key",
+			authDomain: "your-auth-domain",
+			projectId: "your-project-id",
+			storageBucket: "your-storage-bucket",
+			messagingSenderId: "your-messaging-sender-id",
+			appId: "your-app-id"
+		};
+		firebase.initializeApp(firebaseConfig);
+
+		// Get a reference to the storage service, which is used to access the Firebase storage
+		var storage = firebase.storage();
+	</script>
+	<style>
+		.gallery {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			margin: 0 auto;
+			max-width: 800px;
+		}
+		.gallery-item {
+			margin: 10px;
+			max-width: 300px;
+			max-height: 300px;
+			overflow: hidden;
+			border-radius: 5px;
+			cursor: pointer;
+			position: relative;
+		}
+		.gallery-item img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			transition: transform 0.2s ease-in-out;
+		}
+		.gallery-item:hover img {
+			transform: scale(1.1);
+		}
+		.gallery-item:hover .overlay {
+			opacity: 1;
+		}
+		.overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: rgba(0, 0, 0, 0.5);
+			color: #fff;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 2rem;
+			opacity: 0;
+			transition: opacity 0.2s ease-in-out;
+		}
+	</style>
+</head>
+<body>
+	<div class="gallery"></div>
+	<script>
+		// Get a reference to the Firebase storage
+		var storageRef = storage.ref();
+
+		// Get a reference to the gallery div
+		var gallery = document.querySelector('.gallery');
+
+		// List all items in the storage bucket
+		storageRef.listAll().then(function(result) {
+			result.items.forEach(function(itemRef) {
+				// Get the download URL for the item
+				itemRef.getDownloadURL().then(function(url) {
+					// Create a new gallery item with the image or video
+					var galleryItem = document.createElement('div');
+					galleryItem.classList.add('gallery-item');
+
+					if (url.endsWith('.mp4')) {
+						// Create a video element for the video
+						var video = document.createElement('video');
+						video.src = url;
+						video.controls = true;
+						galleryItem.appendChild(video);
+					} else {
+						// Create an image element for the image
+						var img = document.createElement('img');
+						img.src = url;
+						galleryItem.appendChild(img);
+					}
+
+					// Create an overlay for the gallery item
+					var overlay = document.createElement('div');
+					overlay.classList.add('overlay');
+					overlay.innerText = url.split('/').pop();
